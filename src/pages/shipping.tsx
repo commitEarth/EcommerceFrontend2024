@@ -5,11 +5,14 @@ import { useNavigate } from 'react-router-dom'
 import { CartReducerInitialState } from '../types/reducer-types';
 import { useEffect } from 'react';
 import axios from 'axios';
-import { server } from '../redux/store';
+import { RootState, server } from '../redux/store';
 import toast from 'react-hot-toast';
 import { saveShippingInfo } from '../redux/reducer/cartReducer';
 
 const Shipping = () => {
+
+  const { user } = useSelector((state: RootState) => state.userReducer);
+
   const { cartItems,total} = useSelector(
       (state: { cartReducer: CartReducerInitialState }) => state.cartReducer);
 
@@ -43,8 +46,9 @@ const Shipping = () => {
       dispatch(saveShippingInfo(shippingInfo));
        
       try{
-        const {data}=await axios.post(`${server}/api/v1/payment/create`,{
+        const {data}=await axios.post(`${server}/api/v1/payment/create?id=${user?._id}`,{
           amount:total
+          
         },{
           headers:{
             "Content-Type":"application/json"
@@ -52,7 +56,7 @@ const Shipping = () => {
         });
 
         navigate("/pay",{
-          state:data.clientSsecret
+          state:data.ClientSecret
         })
 
       }
@@ -95,3 +99,9 @@ const Shipping = () => {
 }
 
 export default Shipping
+
+
+
+
+
+
